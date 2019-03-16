@@ -25,7 +25,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from PIL import Image
-from IPython.display import clear_output
 
 from pathlib import Path
 from collections import OrderedDict
@@ -39,6 +38,7 @@ samples_count
 
 torch.cuda.is_available()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(device)
 
 n_z = 64
 cnl =3
@@ -260,7 +260,6 @@ for epoch in range(1,epochs+1):
       )
     
     
-  clear_output()
   fake = gen(fixed_noise)
   vutils.save_image(fake.detach(),
           '%s/fake_samples_epoch_%03d.png' % ('check_points', epoch),
@@ -269,7 +268,7 @@ for epoch in range(1,epochs+1):
   #plt.show()
   
   
-  torch.save(netG.state_dict(), '%s/netG_epoch_%d.pth' % ('check_points', epoch))
-  torch.save(netD.state_dict(), '%s/netD_epoch_%d.pth' % ('check_points', epoch))
+  torch.save(gen.state_dict(), '%s/netG_epoch_%d.pth' % ('check_points', epoch))
+  torch.save(dis.state_dict(), '%s/netD_epoch_%d.pth' % ('check_points', epoch))
 
 plt.imshow(Image.open('./check_points/fake_samples_epoch_002.png'))

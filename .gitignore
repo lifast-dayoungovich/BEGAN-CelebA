@@ -1,2 +1,4 @@
 **/*.pth
+img_align_celeba/
+began-env/
 
