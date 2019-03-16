@@ -45,7 +45,7 @@ cnl =3
 n = 64
 
 lr = 0.0001
-weight_decay = 2
+weight_decay = 0.0005
 
 lam = 0.001
 gamma= 0.35
@@ -196,8 +196,8 @@ class BEGANLoss(nn.Module):
     return loss
 loss_func = BEGANLoss()
 
-optimizerD = optim.Adam(dis.parameters(), lr=lr, weight_decay=weight_decay)
-optimizerG = optim.Adam(gen.parameters(), lr=lr, weight_decay=weight_decay)
+optimizerD = optim.Adam(dis.parameters(), lr=lr, weight_decay=weight_decay, betas=(0.5, 0.999))
+optimizerG = optim.Adam(gen.parameters(), lr=lr, weight_decay=weight_decay, betas=(0.5, 0.999))
 
 dataset = dset.ImageFolder(root= data_folder,
                                transform=transforms.Compose([
