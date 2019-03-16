@@ -42,7 +42,7 @@ print(device)
 
 n_z = 64
 cnl =3
-n = 64
+n = 128
 
 lr = 0.0001
 weight_decay = 0.0005
@@ -234,6 +234,7 @@ for epoch in range(1,epochs+1):
     
     d_loss.backward()
     optimizerD.step()
+    optimizerG.step()
     #
     gen.zero_grad()
     random_noise = torch.randn(batch.shape[0],n_z, device=device)
