@@ -53,7 +53,7 @@ eta = 1
 k = 0
 
 batch_size = 16
-input_size = 64
+input_size = 128
 epochs = 3
 
 
@@ -201,17 +201,17 @@ class Discriminator(nn.Module):
         return self.model(x)
 
 
-dis = Discriminator.to(device)
+dis = Discriminator().to(device)
 dis.apply(weights_init_normal)
 
-test = dis(torch.randn(16, 3, 64, 64, device=device))
+test = dis(torch.randn(16, 3, input_size, input_size, device=device))
 print(test.shape)
 
 
 class BEGANLoss(nn.Module):
 
-    def forward(self, target, gen_loss=False):
-        loss = torch.mean(torch.pow(torch.abs(target - (dis(target).detach() if gen_loss else dis(target))), eta))
+    def forward(self, target):
+        loss = torch.mean(torch.pow(torch.abs(target -  dis(target)), eta))
         return loss
 
 
