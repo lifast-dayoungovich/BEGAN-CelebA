@@ -34,7 +34,6 @@ data_folder = 'img_align_celeba'
 # plt.imshow(Image.open(next(Path(data_folder+'/faces').iterdir())))
 
 samples_count = len(sorted(Path(data_folder + '/faces').iterdir()))
-samples_count
 
 torch.cuda.is_available()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -60,7 +59,7 @@ epochs = 3
 def weights_init_normal(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
-        torch.nn.init.normal_(m.weight.data, 0.0, 0.02)
+        nn.init.normal_(m.weight.data, 0.0, 0.02)
 
 
 class Decoder(nn.Module):
@@ -99,6 +98,13 @@ class Decoder(nn.Module):
                 ('conv_4_2', nn.Conv2d(n, n, 3, padding=1)),
                 ('elu_4_2', nn.ELU()),
             ]))
+        self.dec_block_5 = nn.Sequential(
+            OrderedDict([
+                ('conv_5_1', nn.Conv2d(n, n, 3, padding=1)),
+                ('elu_5_1', nn.ELU()),
+                ('conv_5_2', nn.Conv2d(n, n, 3, padding=1)),
+                ('elu_5_2', nn.ELU()),
+            ]))
         self.dec_out = nn.Sequential(
             OrderedDict([
                 ('conv_out', nn.Conv2d(n, cnl, 3, padding=1)),
@@ -119,8 +125,12 @@ class Decoder(nn.Module):
         res_3 = F.interpolate(x, scale_factor=8)
         out_3 = x_3 + res_3
 
-        x_4 = self.dec_block_4(out_3)
-        out = self.dec_out(x_4)
+        x_4 = F.interpolate(self.dec_block_4(out_3), scale_factor=2)
+        res_4 = F.interpolate(x, scale_factor=16)
+        out_4 = x_4 + res_4
+
+        x_5 = self.dec_block_5(out_4)
+        out = self.dec_out(x_5)
 
         return out
 
@@ -168,12 +178,20 @@ class Encoder(nn.Module):
             OrderedDict([
                 ('conv_4_1', nn.Conv2d(4 * n, 4 * n, 3, padding=1)),
                 ('elu_4_1', nn.ELU()),
-                ('conv_4_2', nn.Conv2d(4 * n, 4 * n, 3, padding=1)),
+                ('conv_4_2', nn.Conv2d(4 * n, 5 * n, 3, padding=1)),
                 ('elu_4_2', nn.ELU()),
+                ('conv_sub_4', nn.Conv2d(5 * n, 5 * n, 2, stride=2, padding=0)),
+            ]))
+        self.enc_block_5 = nn.Sequential(
+            OrderedDict([
+                ('conv_5_1', nn.Conv2d(5 * n, 5 * n, 3, padding=1)),
+                ('elu_5_1', nn.ELU()),
+                ('conv_5_2', nn.Conv2d(5 * n, 5 * n, 3, padding=1)),
+                ('elu_5_2', nn.ELU()),
             ]))
         self.enc_out = nn.Sequential(
             OrderedDict([
-                ('enc_out', nn.Linear(8 * 8 * 4 * n, n_z))
+                ('enc_out', nn.Linear(8 * 8 * 5 * n, n_z))
             ]))
 
     def forward(self, x):
@@ -185,8 +203,10 @@ class Encoder(nn.Module):
 
         x_3 = self.enc_block_3(x_2)
 
-        x_4 = self.enc_block_4(x_3).view(-1, 8 * 8 * 4 * n)
-        out = self.enc_out(x_4)
+        x_4 = self.enc_block_4(x_3)
+
+        x_5 = self.enc_block_5(x_4).view(-1, 8 * 8 * 5 * n)
+        out = self.enc_out(x_5)
 
         return out
 
@@ -278,7 +298,7 @@ for epoch in range(1, epochs + 1):
         if i % 1e3 == 0:
             print(
                 'Epoch {} [{}/{}]Convergence: {}, G_Loss: {}, D_Loss: {}, k: {}'
-                    .format(epoch, iterations % samples_count, samples_count, M, g_loss.item(), d_loss.item(), k)
+                .format(epoch, iterations % samples_count, samples_count, M, g_loss.item(), d_loss.item(), k)
             )
 
     fake = gen(fixed_noise)
