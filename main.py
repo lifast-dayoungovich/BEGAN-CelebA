@@ -52,7 +52,7 @@ eta = 1
 k = 0
 
 batch_size = 32
-input_size = 128
+input_size = 64
 epochs = 10
 
 
@@ -103,14 +103,14 @@ class Decoder(nn.Module):
                 ('conv_4_2', nn.Conv2d(n, n, 3, padding=1)),
                 ('elu_4_2', nn.ELU()),
             ]))
-        self.dec_block_5 = nn.Sequential(
-            OrderedDict([
-                ('bn_5', nn.BatchNorm2d(n)),
-                ('conv_5_1', nn.Conv2d(n, n, 3, padding=1)),
-                ('elu_5_1', nn.ELU()),
-                ('conv_5_2', nn.Conv2d(n, n, 3, padding=1)),
-                ('elu_5_2', nn.ELU()),
-            ]))
+        # self.dec_block_5 = nn.Sequential(
+        #     OrderedDict([
+        #         ('bn_5', nn.BatchNorm2d(n)),
+        #         ('conv_5_1', nn.Conv2d(n, n, 3, padding=1)),
+        #         ('elu_5_1', nn.ELU()),
+        #         ('conv_5_2', nn.Conv2d(n, n, 3, padding=1)),
+        #         ('elu_5_2', nn.ELU()),
+        #     ]))
         self.dec_out = nn.Sequential(
             OrderedDict([
                 ('conv_out', nn.Conv2d(n, cnl, 3, padding=1)),
@@ -131,12 +131,12 @@ class Decoder(nn.Module):
         res_3 = F.interpolate(out_2, scale_factor=2)
         out_3 = x_3 + res_3
 
-        x_4 = F.interpolate(self.dec_block_4(out_3), scale_factor=2)
-        res_4 = F.interpolate(out_3, scale_factor=2)
-        out_4 = x_4 + res_4
+        # x_4 = F.interpolate(self.dec_block_4(out_3), scale_factor=2)
+        # res_4 = F.interpolate(out_3, scale_factor=2)
+        # out_4 = x_4 + res_4
 
-        x_5 = self.dec_block_5(out_4)
-        out = self.dec_out(x_5)
+        x_4 = self.dec_block_4(out_3)
+        out = self.dec_out(x_4)
 
         return out
 
@@ -187,21 +187,21 @@ class Encoder(nn.Module):
                 ('bn_4', nn.BatchNorm2d(4*n)),
                 ('conv_4_1', nn.Conv2d(4 * n, 4 * n, 3, padding=1)),
                 ('elu_4_1', nn.ELU()),
-                ('conv_4_2', nn.Conv2d(4 * n, 5 * n, 3, padding=1)),
+                ('conv_4_2', nn.Conv2d(4 * n, 4 * n, 3, padding=1)),
                 ('elu_4_2', nn.ELU()),
-                ('conv_sub_4', nn.Conv2d(5 * n, 5 * n, 2, stride=2, padding=0)),
+        #        ('conv_sub_4', nn.Conv2d(5 * n, 5 * n, 2, stride=2, padding=0)),
             ]))
-        self.enc_block_5 = nn.Sequential(
-            OrderedDict([
-                ('bn_5', nn.BatchNorm2d(5*n)),
-                ('conv_5_1', nn.Conv2d(5 * n, 5 * n, 3, padding=1)),
-                ('elu_5_1', nn.ELU()),
-                ('conv_5_2', nn.Conv2d(5 * n, 5 * n, 3, padding=1)),
-                ('elu_5_2', nn.ELU()),
-            ]))
+        # self.enc_block_5 = nn.Sequential(
+        #     OrderedDict([
+        #         ('bn_5', nn.BatchNorm2d(5*n)),
+        #         ('conv_5_1', nn.Conv2d(5 * n, 5 * n, 3, padding=1)),
+        #         ('elu_5_1', nn.ELU()),
+        #         ('conv_5_2', nn.Conv2d(5 * n, 5 * n, 3, padding=1)),
+        #         ('elu_5_2', nn.ELU()),
+        #     ]))
         self.enc_out = nn.Sequential(
             OrderedDict([
-                ('enc_out', nn.Linear(8 * 8 * 5 * n, n_z))
+                ('enc_out', nn.Linear(8 * 8 * 4 * n, n_z))
             ]))
 
     def forward(self, x):
@@ -213,10 +213,10 @@ class Encoder(nn.Module):
 
         x_3 = self.enc_block_3(x_2)
 
-        x_4 = self.enc_block_4(x_3)
+        #x_4 = self.enc_block_4(x_3)
 
-        x_5 = self.enc_block_5(x_4).view(-1, 8 * 8 * 5 * n)
-        out = self.enc_out(x_5)
+        x_4 = self.enc_block_4(x_3).view(-1, 8 * 8 * 4 * n)
+        out = self.enc_out(x_4)
 
         return out
 
