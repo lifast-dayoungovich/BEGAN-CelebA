@@ -53,7 +53,7 @@ k = 0
 
 batch_size = 16
 input_size = 128
-epochs = 3
+epochs = 10
 
 
 def weights_init_normal(m):
@@ -230,8 +230,8 @@ print(test.shape)
 
 class BEGANLoss(nn.Module):
 
-    def forward(self, target):
-        loss = torch.mean(torch.pow(torch.abs(target -  dis(target)), eta))
+    def forward(self, target,generator=False):
+        loss = torch.mean(torch.pow(torch.abs(target -  dis(target).detach() if generator else dis(target)), eta))
         return loss
 
 
@@ -278,7 +278,7 @@ for epoch in range(1, epochs + 1):
 
         #
         random_noise = torch.randn(batch.shape[0], n_z, device=device)
-        g_loss = loss_func(gen(random_noise))
+        g_loss = loss_func(gen(random_noise), True)
 
         g_loss.backward()
         optimizerG.step()
