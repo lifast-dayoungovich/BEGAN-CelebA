@@ -114,19 +114,19 @@ class Decoder(nn.Module):
         x = self.dec_h0(x).view(-1, n, 8, 8)
 
         x_1 = F.interpolate(self.dec_block_1(x), scale_factor=2)
-        res_1 = F.interpolate(x, scale_factor=2)
-        out_1 = x_1 + res_1
+        #res_1 = F.interpolate(x, scale_factor=2)
+        out_1 = x_1# + res_1
 
         x_2 = F.interpolate(self.dec_block_2(out_1), scale_factor=2)
-        res_2 = F.interpolate(x, scale_factor=4)
+        res_2 = F.interpolate(out_1, scale_factor=2)
         out_2 = x_2 + res_2
 
         x_3 = F.interpolate(self.dec_block_3(out_2), scale_factor=2)
-        res_3 = F.interpolate(x, scale_factor=8)
+        res_3 = F.interpolate(out_2, scale_factor=2)
         out_3 = x_3 + res_3
 
         x_4 = F.interpolate(self.dec_block_4(out_3), scale_factor=2)
-        res_4 = F.interpolate(x, scale_factor=16)
+        res_4 = F.interpolate(out_3, scale_factor=2)
         out_4 = x_4 + res_4
 
         x_5 = self.dec_block_5(out_4)
@@ -231,7 +231,7 @@ print(test.shape)
 class BEGANLoss(nn.Module):
 
     def forward(self, target,generator=False):
-        loss = torch.mean(torch.pow(torch.abs(target -  dis(target).detach() if generator else dis(target)), eta))
+        loss = torch.mean(torch.pow(torch.abs(target - (dis(target).detach() if generator else dis(target))), eta))
         return loss
 
 
