@@ -79,6 +79,7 @@ class Decoder(nn.Module):
             ]))
         self.dec_block_2 = nn.Sequential(
             OrderedDict([
+                ('bn_2', nn.BatchNorm2d(n)),
                 ('conv_2_1', nn.Conv2d(n, n, 3, padding=1)),
                 ('elu_2_1', nn.ELU()),
                 ('conv_2_2', nn.Conv2d(n, n, 3, padding=1)),
@@ -86,6 +87,7 @@ class Decoder(nn.Module):
             ]))
         self.dec_block_3 = nn.Sequential(
             OrderedDict([
+                ('bn_3', nn.BatchNorm2d(n)),
                 ('conv_3_1', nn.Conv2d(n, n, 3, padding=1)),
                 ('elu_3_1', nn.ELU()),
                 ('conv_3_2', nn.Conv2d(n, n, 3, padding=1)),
@@ -93,6 +95,7 @@ class Decoder(nn.Module):
             ]))
         self.dec_block_4 = nn.Sequential(
             OrderedDict([
+                ('bn_4', nn.BatchNorm2d(n)),
                 ('conv_4_1', nn.Conv2d(n, n, 3, padding=1)),
                 ('elu_4_1', nn.ELU()),
                 ('conv_4_2', nn.Conv2d(n, n, 3, padding=1)),
@@ -100,6 +103,7 @@ class Decoder(nn.Module):
             ]))
         self.dec_block_5 = nn.Sequential(
             OrderedDict([
+                ('bn_5', nn.BatchNorm2d(n)),
                 ('conv_5_1', nn.Conv2d(n, n, 3, padding=1)),
                 ('elu_5_1', nn.ELU()),
                 ('conv_5_2', nn.Conv2d(n, n, 3, padding=1)),
@@ -160,6 +164,7 @@ class Encoder(nn.Module):
             ]))
         self.enc_block_2 = nn.Sequential(
             OrderedDict([
+                ('bn_2', nn.BatchNorm2d(2*n)),
                 ('conv_2_1', nn.Conv2d(2 * n, 2 * n, 3, padding=1)),
                 ('elu_2_1', nn.ELU()),
                 ('conv_2_2', nn.Conv2d(2 * n, 3 * n, 3, padding=1)),
@@ -168,6 +173,7 @@ class Encoder(nn.Module):
             ]))
         self.enc_block_3 = nn.Sequential(
             OrderedDict([
+                ('bn_3', nn.BatchNorm2d(3*n)),
                 ('conv_3_1', nn.Conv2d(3 * n, 3 * n, 3, padding=1)),
                 ('elu_3_1', nn.ELU()),
                 ('conv_3_2', nn.Conv2d(3 * n, 4 * n, 3, padding=1)),
@@ -176,6 +182,7 @@ class Encoder(nn.Module):
             ]))
         self.enc_block_4 = nn.Sequential(
             OrderedDict([
+                ('bn_4', nn.BatchNorm2d(4*n)),
                 ('conv_4_1', nn.Conv2d(4 * n, 4 * n, 3, padding=1)),
                 ('elu_4_1', nn.ELU()),
                 ('conv_4_2', nn.Conv2d(4 * n, 5 * n, 3, padding=1)),
@@ -184,6 +191,7 @@ class Encoder(nn.Module):
             ]))
         self.enc_block_5 = nn.Sequential(
             OrderedDict([
+                ('bn_5', nn.BatchNorm2d(5*n)),
                 ('conv_5_1', nn.Conv2d(5 * n, 5 * n, 3, padding=1)),
                 ('elu_5_1', nn.ELU()),
                 ('conv_5_2', nn.Conv2d(5 * n, 5 * n, 3, padding=1)),
