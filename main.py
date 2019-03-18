@@ -51,7 +51,7 @@ gamma = 0.4
 eta = 1
 k = 0
 
-batch_size = 16
+batch_size = 32
 input_size = 128
 epochs = 10
 
@@ -237,8 +237,8 @@ class BEGANLoss(nn.Module):
 
 loss_func = BEGANLoss()
 
-optimizerD = optim.Adam(dis.parameters(), lr=lr, weight_decay=weight_decay, betas=(0.5, 0.999))
-optimizerG = optim.Adam(gen.parameters(), lr=lr, weight_decay=weight_decay, betas=(0.5, 0.999))
+optimizerD = optim.Adam(dis.parameters(), lr=lr, betas=(0.5, 0.999))
+optimizerG = optim.Adam(gen.parameters(), lr=lr, betas=(0.5, 0.999))
 
 dataset = dset.ImageFolder(root=data_folder,
                            transform=transforms.Compose([
