@@ -23,12 +23,25 @@ import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
 
 from PIL import Image
 
 from pathlib import Path
 from collections import OrderedDict
 from math import ceil
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--start_from',  type=int, help='Start from n epoch', default=0)
+options = parser.parse_args()
+
+
+
+
+
+
+
 
 data_folder = 'img_align_celeba'
 # plt.imshow(Image.open(next(Path(data_folder+'/faces').iterdir())))
@@ -53,7 +66,7 @@ k = 0
 
 batch_size = 32
 input_size = 64
-epochs = 10
+epochs = 20
 
 
 def weights_init_normal(m):
@@ -238,6 +251,9 @@ test = dis(torch.randn(16, 3, input_size, input_size, device=device))
 print(test.shape)
 
 
+
+
+
 class BEGANLoss(nn.Module):
 
     def forward(self, target,generator=False):
@@ -249,6 +265,16 @@ loss_func = BEGANLoss()
 
 optimizerD = optim.Adam(dis.parameters(), lr=lr, betas=(0.5, 0.999))
 optimizerG = optim.Adam(gen.parameters(), lr=lr, betas=(0.5, 0.999))
+
+
+if options.start_from > 0:
+
+    if Path('check_points/netD_epoch_{}.pth'.format(options.start_from)).exists():
+        dis.load_state_dict(torch.load('check_points/netD_epoch_{}.pth'.format(options.start_from)))
+        gen.load_state_dict(torch.load('check_points/netG_epoch_{}.pth'.format(options.start_from)))
+    if Path('check_points/netD_optim_epoch_{}.pth'.format(options.start_from)).exists():
+        optimizerD.load_state_dict(torch.load('check_points/netD_optim_epoch_{}.pth'.format(options.start_from)))
+        optimizerG.load_state_dict(torch.load('check_points/netG_optim_epoch_{}.pth'.format(options.start_from)))
 
 dataset = dset.ImageFolder(root=data_folder,
                            transform=transforms.Compose([
@@ -270,7 +296,7 @@ gen_loss_track = []
 dis_loss_track = []
 iterations = 0
 
-for epoch in range(1, epochs + 1):
+for epoch in range(options.start_from, epochs + 1):
     for i, data in enumerate(dataloader, 0):
 
         dis.zero_grad()
@@ -320,5 +346,7 @@ for epoch in range(1, epochs + 1):
 
     torch.save(gen.state_dict(), '%s/netG_epoch_%d.pth' % ('check_points', epoch))
     torch.save(dis.state_dict(), '%s/netD_epoch_%d.pth' % ('check_points', epoch))
+    torch.save(optimizerD.state_dict(),'%s/netD_optim_epoch_%d.pth'%('check_points', epoch))
+    torch.save(optimizerG.state_dict(),'%s/netG_optim_epoch_%d.pth'%('check_points', epoch))
 
 # plt.imshow(Image.open('./check_points/fake_samples_epoch_002.png'))
